@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Tic Tac Toe</title>
+    <style>
+      body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: sans-serif;
+  background-color: #edeceaed;
+}
+
+h1 {
+  margin-top: 20px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-template-rows: repeat(3, 100px);
+  gap: 5px;
+  margin-top: 20px;
+}
+
+.cell {
+  background-color: rgb(105, 242, 244);
+  border: 2px solid #000000;
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.cell.x {
+  color: rgb(158, 0, 0);
+}
+
+.cell.o {
+  color: rgb(0, 0, 0);
+}
+
+.message {
+  margin-top: 20px;
+  font-size: 1.5rem;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+    </style>
+  </head>
+  <body>
+    h1>Tic Tac Toe</h1>
+  <div class="board" id="board">
+    <div class="cell" data-cell></div>
+    <div class="cell" data-cell></div>
+    <div class="cell" data-cell></div>
+    <div class="cell" data-cell></div>
+    <div class="cell" data-cell></div>
+    <div class="cell" data-cell></div>
+    <div class="cell" data-cell></div>
+    <div class="cell" data-cell></div>
+    <div class="cell" data-cell></div>
+  </div>
+  <div class="message" id="message"></div>
+  <button id="restart">Restart</button>
+
+  <script>
+    const cells = document.querySelectorAll('[data-cell]');
+const board = document.getElementById('board');
+const message = document.getElementById('message');
+const restartButton = document.getElementById('restart');
+
+let isXTurn = true;
+
+const WINNING_COMBINATIONS = [
+  [0,1,2], [3,4,5], [6,7,8], // rows
+  [0,3,6], [1,4,7], [2,5,8], // cols
+  [0,4,8], [2,4,6]           // diagonals
+];
+
+startGame();
+
+restartButton.addEventListener('click', startGame);
+
+function startGame() {
+  isXTurn = true;
+  cells.forEach(cell => {
+    cell.classList.remove('x', 'o');
+    cell.textContent = '';
+    cell.addEventListener('click', handleClick, { once: true });
+  });
+  setMessage('');
+}
+
+function handleClick(e) {
+  const cell = e.target;
+  const currentClass = isXTurn ? 'x' : 'o';
+  placeMark(cell, currentClass);
+
+  if (checkWin(currentClass)) {
+    endGame(false);
+  } else if (isDraw()) {
+    endGame(true);
+  } else {
+    isXTurn = !isXTurn;
+  }
+}
+
+function placeMark(cell, currentClass) {
+  cell.classList.add(currentClass);
+  cell.textContent = currentClass.toUpperCase();
+}
+
+function checkWin(currentClass) {
+  return WINNING_COMBINATIONS.some(combination => {
+    return combination.every(index => {
+      return cells[index].classList.contains(currentClass);
+    });
+  });
+}
+
+function isDraw() {
+  return [...cells].every(cell => {
+    return cell.classList.contains('x') || cell.classList.contains('o');
+  });
+}
+
+function endGame(draw) {
+  if (draw) {
+    setMessage("It's a Draw!");
+  } else {
+    setMessage(`${isXTurn ? "X" : "O"} Wins!`);
+  }
+  cells.forEach(cell => cell.removeEventListener('click', handleClick));
+}
+
+function setMessage(text) {
+  message.textContent = text;
+}
+  </script>
+  </body>
+</html>
